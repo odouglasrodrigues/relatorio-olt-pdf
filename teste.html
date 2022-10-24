@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<!--
+    WARNING! Make sure that you match all Quasar related
+    tags to the same version! (Below it's "@2.10.0")
+  -->
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Material+Icons" rel="stylesheet" type="text/css">
+    <link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" rel="stylesheet" type="text/css">
+    <link href="https://use.fontawesome.com/releases/v6.1.1/css/all.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.jsdelivr.net/npm/quasar@2.10.0/dist/quasar.prod.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <!-- example of injection point where you write your app template -->
+    <div id="q-app">
+
+        <q-layout view="hhh lpR fFf">
+
+            <q-header elevated class="text-white cabecalho">
+                <q-toolbar class="glossy ">
+                    <q-toolbar-title>
+                        <div class="fit row  justify-between items-center content-center">
+                            <div class="logoToolbar"><img src="Logo TP.png" style="width: 180px;"></div>
+                            <div class="titleToolbar">Relatório de Rede</div>
+                            <div class="infoToolbar justify-center items-center content-center"> Relatório gerado em:
+                                <div>{{data}} - {{hora}}</div>
+                            </div>
+                        </div>
+
+
+
+                    </q-toolbar-title>
+                </q-toolbar>
+            </q-header>
+
+            <q-page-container>
+                <h1>Teste</h1>
+                {{jsonData}}
+            </q-page-container>
+
+        </q-layout>
+
+    </div>
+
+    <!-- Add the following at the end of your body tag -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quasar@2.10.0/dist/quasar.umd.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quasar@2.10.0/dist/lang/pt-BR.umd.prod.js"></script>
+
+    <script>
+        const { useQuasar } = Quasar
+
+
+        const app = Vue.createApp({
+            setup() {
+                const $q = useQuasar()
+
+                return {
+                    data: "24/10/2022",
+                    hora: "14:09"
+                }
+            },
+            data() {
+                return { jsonData: {}, novoJson: {} }
+
+            },
+            methods: {
+                async GetJson() {
+                    fetch('./dados.json', {
+                        method: 'GET',
+                        mode: 'cors',
+                        cache: 'default'
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            this.jsonData = data
+                        })
+
+                }
+            },
+            created() {
+                this.GetJson()
+                $.getJSON('./dados.json',).then(data => {
+                    this.novoJson = data
+                })
+
+            },
+        })
+
+        app.use(Quasar, { config: {} })
+        app.mount('#q-app')
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@1,500&display=swap');
+
+        body,
+        html {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .cabecalho {
+            background: rgb(13, 36, 102);
+        }
+
+        .titleToolbar {
+            font-size: 35px;
+            margin-left: -40px;
+        }
+
+        .infoToolbar {
+            font-size: 10px;
+        }
+    </style>
+</body>
+
+</html>

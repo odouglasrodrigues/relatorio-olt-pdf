@@ -1,0 +1,14 @@
+{
+  "name": "html-pdf",
+  "version": "1.0.0",
+  "description": "Converte HTML para PDF",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Douglas Rodrigues <douglas.rodrigues96.dr@gmail.com> (https://tripleplay.com.br/)",
+  "license": "MIT",
+  "dependencies": {
+    "html-pdf-node": "^1.0.8"
+  }
+}
