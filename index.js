@@ -7,7 +7,7 @@ const options = { format: 'A4', path: 'teste.pdf', printBackground:true};
 
 // const fileInHtml = { content: fs.readFileSync('data.html', 'utf8') };
 
-const fileInHtml = { url:'file:///C:/Users/dougl/Desktop/Projetos/html-pdf/data.html'};
+const fileInHtml = { url:'file:///C:/Users/dougl/Desktop/Projetos/relatorio-olt-pdf/data.html'};
 
 // pdf.create(fileInHtml, options).toFile('businesscard.pdf', function (err, res) {
 //     if (err) return console.log(err);
