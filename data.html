@@ -10,7 +10,7 @@
     <link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" rel="stylesheet" type="text/css">
     <link href="https://use.fontawesome.com/releases/v6.1.1/css/all.css" rel="stylesheet" type="text/css">
     <link href="https://cdn.jsdelivr.net/npm/quasar@2.10.0/dist/quasar.prod.css" rel="stylesheet" type="text/css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    
 </head>
 
 <body>
@@ -39,9 +39,8 @@
             <q-page-container>
                 <h1>Teste</h1>
                 {{jsonData}}
-                <div style="width: 450px; height: 450px">
-                    <canvas id="myChart"></canvas>
-                </div>
+                
+
             </q-page-container>
 
         </q-layout>
@@ -53,6 +52,56 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/quasar@2.10.0/dist/quasar.umd.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/quasar@2.10.0/dist/lang/pt-BR.umd.prod.js"></script>
+    <script>
+        const jsonData = {
+            data: "24/10/2022",
+            hora: "14:09",
+            oltName: "OLT Huawei",
+            quantidadeDePlacas: 3,
+    
+        }
+    
+        const { useQuasar } = Quasar
+    
+    
+        const app = Vue.createApp({
+            setup() {
+                const $q = useQuasar()
+    
+                return {
+                    jsonData
+    
+                }
+            },
+            data() {
+                return {
+    
+                }
+    
+            },
+            methods: {
+                async GetJson() {
+                    fetch('./dados.json', {
+                        method: 'GET',
+                        mode: 'cors',
+                        cache: 'default'
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            this.jsonData = data
+                        })
+    
+                }
+            },
+            created() {
+    
+    
+            },
+        })
+    
+        app.use(Quasar, { config: {} })
+        app.mount('#q-app')
+    </script>
 
     
 
@@ -78,92 +127,8 @@
         }
     </style>
 </body>
+
 <script>
-    const jsonData = {
-        data: "24/10/2022",
-        hora: "14:09",
-        oltName: "OLT Huawei",
-        quantidadeDePlacas: 3,
-
-    }
-    
-
-    const { useQuasar } = Quasar
-
-
-    const app = Vue.createApp({
-        setup() {
-            const $q = useQuasar()
-
-            return {
-                jsonData
-
-            }
-        },
-        data() {
-            return {
-
-            }
-
-        },
-        methods: {
-            async GetJson() {
-                fetch('./dados.json', {
-                    method: 'GET',
-                    mode: 'cors',
-                    cache: 'default'
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        this.jsonData = data
-                    })
-
-            }
-        },
-        created() {
-
-
-        },
-    })
-
-    app.use(Quasar, { config: {} })
-    app.mount('#q-app')
-</script>
-<script>
-    const ctx = document.getElementById('myChart');
-    const myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-            datasets: [{
-                label: 'tete',
-                data: [5, 2, 3, 9],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: false
-                }
-            }
-        }
-    });
+ 
 </script>
 </html>
