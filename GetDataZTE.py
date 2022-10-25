@@ -9,6 +9,7 @@ import statistics
 
 
 pons = []
+SinaisRuins = {}
 
 
 def OrgnnizePonName(dataPonsTotal):
@@ -31,6 +32,11 @@ def GetOntSignal(PonInfo, pon):
             sinal = float(linha.replace(
                 'gpon-onu', '').replace('(dbm)', '').split('-')[1].replace(' ', ''))*(-1)
             sinais.append(sinal)
+            if sinal < -26.00 :
+                id_onu=linha.replace(f'{sinal}(dbm)', '').replace(' ', '')
+                SinaisRuins[pon].append(id_onu)
+                print(SinaisRuins)
+
     if len(sinais) > 0:
         media = statistics.median_grouped(sinais)
         melhor = max(sinais)
@@ -66,7 +72,7 @@ def ConnectOnOLTWithTelnet(ip, user, password, port):
         time.sleep(1)
         return_interfaceList = tn.read_until(
             'Control flag'.encode('utf-8'), 3).decode('utf-8').splitlines()
-
+        print(pon)
         GetOntSignal(return_interfaceList, pon)
 
     tn.write(b"exit\n")
