@@ -10,7 +10,9 @@
     <link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" rel="stylesheet" type="text/css">
     <link href="https://use.fontawesome.com/releases/v6.1.1/css/all.css" rel="stylesheet" type="text/css">
     <link href="https://cdn.jsdelivr.net/npm/quasar@2.10.0/dist/quasar.prod.css" rel="stylesheet" type="text/css">
-    
+    <script type="text/javascript" src="dados.js"></script>
+
+
 </head>
 
 <body>
@@ -26,7 +28,7 @@
                             <div class="logoToolbar"><img src="Logo TP.png" style="width: 180px;"></div>
                             <div class="titleToolbar">Relatório de Rede</div>
                             <div class="infoToolbar justify-center items-center content-center"> Relatório gerado em:
-                                <div>{{jsonData.data}} - {{jsonData.hora}}</div>
+                                <div>{{dadosDoRelatorio.data}} - {{dadosDoRelatorio.hora}}</div>
                             </div>
                         </div>
 
@@ -38,12 +40,18 @@
 
             <q-page-container>
                 <h1>Teste</h1>
-                {{jsonData}}
-                
+               
+                <div style="width: 300px; height: 300px">
+                    <canvas id="myChart" width="400" height="400"></canvas>
+                </div>
+
+
 
             </q-page-container>
 
         </q-layout>
+
+
 
     </div>
 
@@ -52,32 +60,33 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/quasar@2.10.0/dist/quasar.umd.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/quasar@2.10.0/dist/lang/pt-BR.umd.prod.js"></script>
+
+
+
+
     <script>
-        const jsonData = {
-            data: "24/10/2022",
-            hora: "14:09",
-            oltName: "OLT Huawei",
-            quantidadeDePlacas: 3,
-    
-        }
-    
+               
         const { useQuasar } = Quasar
-    
-    
+
+
         const app = Vue.createApp({
             setup() {
                 const $q = useQuasar()
-    
+                
+
+
                 return {
-                    jsonData
-    
+                    dadosDoRelatorio:dadosDoRelatorio,
+                    relatorioPioresSinais:relatorioPioresSinais,
+                    relatorioSinais:relatorioSinais
+
                 }
             },
             data() {
                 return {
-    
+
                 }
-    
+
             },
             methods: {
                 async GetJson() {
@@ -90,20 +99,20 @@
                         .then(data => {
                             this.jsonData = data
                         })
-    
+
                 }
             },
             created() {
-    
-    
+
+                
             },
         })
-    
+
         app.use(Quasar, { config: {} })
         app.mount('#q-app')
     </script>
 
-    
+
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@1,500&display=swap');
@@ -128,7 +137,5 @@
     </style>
 </body>
 
-<script>
- 
-</script>
+
 </html>
