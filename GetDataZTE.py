@@ -6,10 +6,14 @@ import time
 import telnetlib
 import sys
 import statistics
+import json
+import re
 
 
 pons = []
 SinaisRuins = {}
+SinaisRuinsComNome = {}
+relatorioSinal=[]
 
 
 def OrgnnizePonName(dataPonsTotal):
@@ -32,18 +36,38 @@ def GetOntSignal(PonInfo, pon):
             sinal = float(linha.replace(
                 'gpon-onu', '').replace('(dbm)', '').split('-')[1].replace(' ', ''))*(-1)
             sinais.append(sinal)
-            if sinal < -26.00 :
-                id_onu=linha.replace(f'{sinal}(dbm)', '').replace(' ', '')
-                SinaisRuins[pon].append(id_onu)
-                print(SinaisRuins)
+            if sinal < (27.00*-1):
+                id_onu = re.sub(r'-[0-9]+\.[0-9]+\(dbm\)',
+                                '', linha).replace(' ', '')
+
+                SinaisRuins[pon].append({"idOnu": id_onu, "sinal": sinal})
+    
 
     if len(sinais) > 0:
         media = statistics.median_grouped(sinais)
         melhor = max(sinais)
         pior = min(sinais)
 
-        
-        
+        relatorioSinal.append({"pon":pon,"melhor":melhor, "media":media, "pior":pior})
+
+
+def GetDescriptionOfOnu(tn):
+    listaDePonsComSinalRuim = SinaisRuins.keys()
+    for pon in listaDePonsComSinalRuim:
+        if len(SinaisRuins[pon])>0:
+            SinaisRuinsComNome[pon] = []
+            for onu in SinaisRuins[pon]:
+                tn.write(
+                    f'show gpon onu detail-info {onu["idOnu"]}\n'.encode('utf-8'))
+                time.sleep(.5)
+                return_onuInformation = tn.read_until(
+                    'Control flag'.encode('utf-8'), 3).decode('utf-8').splitlines()
+                for linha in return_onuInformation:
+                    if "Name:" in linha:
+                        description = linha.split(':')[1].replace(' ', '')
+                        SinaisRuinsComNome[pon].append(
+                            {"idOnu": onu["idOnu"], "sinal": onu["sinal"], "description": description})
+    
 
 
 def ConnectOnOLTWithTelnet(ip, user, password, port):
@@ -67,13 +91,27 @@ def ConnectOnOLTWithTelnet(ip, user, password, port):
     time.sleep(.3)
 
     for pon in pons:
-        pon_olt = pon.replace("_", "-olt_")
-        tn.write(f'show pon power olt-rx {pon_olt}\n'.encode('utf-8'))
-        time.sleep(1)
-        return_interfaceList = tn.read_until(
-            'Control flag'.encode('utf-8'), 3).decode('utf-8').splitlines()
-        print(pon)
-        GetOntSignal(return_interfaceList, pon)
+        if "_1/9" in pon:
+            continue
+        if "_1/12" in pon:
+            continue
+        if "_1/15" in pon:
+            continue
+        else:
+            pon_olt = pon.replace("_", "-olt_")
+            tn.write(f'show pon power olt-rx {pon_olt}\n'.encode('utf-8'))
+            time.sleep(1)
+            return_interfaceList = tn.read_until(
+                'Control flag'.encode('utf-8'), 3).decode('utf-8').splitlines()
+            print(pon)
+            SinaisRuins[pon] = []
+            GetOntSignal(return_interfaceList, pon)
+
+    GetDescriptionOfOnu(tn)
+
+    print(SinaisRuinsComNome)
+    print("====\n====\n====\n")
+    print(relatorioSinal)
 
     tn.write(b"exit\n")
     time.sleep(.3)
