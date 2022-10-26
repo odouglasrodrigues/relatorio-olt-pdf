@@ -6,14 +6,42 @@ import time
 import telnetlib
 import sys
 import statistics
-import json
 import re
+import matplotlib.pyplot as plt
 
 
 pons = []
 SinaisRuins = {}
 SinaisRuinsComNome = {}
-relatorioSinal=[]
+relatorioSinal = []
+relatorioPons = {}
+dadosDoRelatorio = {
+    'data': "25/10/2022",
+    'hora': "14:09",
+    'oltName': "OLT Huawei"
+}
+
+
+def GeraGrafico(pon, onus):
+    faixa = ['Ótimo', 'Bom', 'Ruim']
+    # onus = [11, 20, 29]
+    cor = ['#05F131', '#EAA706', '#F31616']
+    # borda = ['255,255,0', '255,255,0', '255,255,0']
+    explode = (0.09, 0.02, 0.02)
+
+    plt.pie(onus, labels=faixa, colors=cor, autopct=lambda v: f"{sum(onus)*v/100:.0f} ONUs",
+            explode=explode, wedgeprops={'edgecolor': 'black', 'linewidth': 1, 'antialiased': True})
+
+    plt.legend(['-13 à -22', '-22 à -27', '-27 à -33'], loc=3)
+    plt.title(
+        f"Quantidade de ONU x Qualidade de sinal - PON {pon} ", fontsize=15)
+    plt.axis('equal')
+
+    # plt.show()
+    arqName = f"{pon.replace('/','-')}.png"
+
+    plt.savefig(arqName, format='png')
+    plt.close()
 
 
 def OrgnnizePonName(dataPonsTotal):
@@ -31,30 +59,43 @@ def GetPonNameInfo():
 
 def GetOntSignal(PonInfo, pon):
     sinais = []
+    sinais_Bons = []
+    sinais_Otimos = []
+    sinais_Ruins = []
     for linha in PonInfo:
         if "dbm" in linha:
             sinal = float(linha.replace(
                 'gpon-onu', '').replace('(dbm)', '').split('-')[1].replace(' ', ''))*(-1)
             sinais.append(sinal)
-            if sinal < (27.00*-1):
+            if sinal < -27.00:
                 id_onu = re.sub(r'-[0-9]+\.[0-9]+\(dbm\)',
                                 '', linha).replace(' ', '')
-
+                sinais_Ruins.append(sinal)
                 SinaisRuins[pon].append({"idOnu": id_onu, "sinal": sinal})
-    
+            if sinal < -22.00 and sinal > -27.00:
+                sinais_Bons.append(sinal)
+            if sinal < -9.00 and sinal > -22.00:
+                sinais_Otimos.append(sinal)
 
     if len(sinais) > 0:
         media = statistics.median_grouped(sinais)
         melhor = max(sinais)
         pior = min(sinais)
 
-        relatorioSinal.append({"pon":pon,"melhor":melhor, "media":media, "pior":pior})
+        qntOnu = [len(sinais_Otimos), len(sinais_Bons), len(sinais_Ruins)]
+
+        GeraGrafico(pon, qntOnu)
+
+        relatorioSinal.append(
+            {"pon": pon, "melhor": melhor, "media": media, "pior": pior})
+        relatorioPons[pon].update({'onusSinalBom': len(sinais_Bons), 'onusSinalOtimo': len(sinais_Otimos), 'onusSinalRuim': len(
+            sinais_Ruins), 'melhorSinal': melhor, 'piorSinal': pior, 'mediaSinal': media, 'onuComSinalRuim': []})
 
 
 def GetDescriptionOfOnu(tn):
     listaDePonsComSinalRuim = SinaisRuins.keys()
     for pon in listaDePonsComSinalRuim:
-        if len(SinaisRuins[pon])>0:
+        if len(SinaisRuins[pon]) > 0:
             SinaisRuinsComNome[pon] = []
             for onu in SinaisRuins[pon]:
                 tn.write(
@@ -65,9 +106,23 @@ def GetDescriptionOfOnu(tn):
                 for linha in return_onuInformation:
                     if "Name:" in linha:
                         description = linha.split(':')[1].replace(' ', '')
-                        SinaisRuinsComNome[pon].append(
+                        relatorioPons[pon]['onuComSinalRuim'].append(
                             {"idOnu": onu["idOnu"], "sinal": onu["sinal"], "description": description})
-    
+
+
+def GetOntProvisionedAndOntOnline(tn, pon):
+    pon_olt = pon.replace("_", "-olt_")
+    tn.write(f'show gpon onu state {pon_olt}\n'.encode('utf-8'))
+    time.sleep(1)
+    PonInfo = tn.read_until(
+        'Control flag'.encode('utf-8'), 3).decode('utf-8').splitlines()
+    for linha in PonInfo:
+        if "ONU Number" in linha:
+            onuOnline = int(linha.split(':')[1].split('/')[0].replace(" ", ""))
+            onuProvisioned = int(linha.split(
+                ':')[1].split('/')[1].replace(" ", ""))
+            relatorioPons[pon] = {'online': onuOnline, 'provisionada': onuProvisioned, 'offline': (
+                onuProvisioned-onuOnline)}
 
 
 def ConnectOnOLTWithTelnet(ip, user, password, port):
@@ -105,13 +160,16 @@ def ConnectOnOLTWithTelnet(ip, user, password, port):
                 'Control flag'.encode('utf-8'), 3).decode('utf-8').splitlines()
             print(pon)
             SinaisRuins[pon] = []
+            relatorioPons[pon] = {}
+            GetOntProvisionedAndOntOnline(tn, pon)
             GetOntSignal(return_interfaceList, pon)
 
     GetDescriptionOfOnu(tn)
 
-    print(SinaisRuinsComNome)
-    print("====\n====\n====\n")
-    print(relatorioSinal)
+    
+    with open('dados.js','w') as f:
+        f.write(f'const relatorioPons={relatorioPons}\n\nconst dadosDoRelatorio={dadosDoRelatorio}\n\n')
+    # print(relatorioPons)
 
     tn.write(b"exit\n")
     time.sleep(.3)
