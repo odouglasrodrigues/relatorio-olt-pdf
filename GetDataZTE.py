@@ -148,23 +148,16 @@ def ConnectOnOLTWithTelnet(ip, user, password, port):
     time.sleep(.3)
 
     for pon in pons:
-        if "_1/9" in pon:
-            continue
-        if "_1/12" in pon:
-            continue
-        if "_1/15" in pon:
-            continue
-        else:
-            pon_olt = pon.replace("_", "-olt_")
-            tn.write(f'show pon power olt-rx {pon_olt}\n'.encode('utf-8'))
-            time.sleep(1)
-            return_interfaceList = tn.read_until(
-                'Control flag'.encode('utf-8'), 3).decode('utf-8').splitlines()
-            print(pon)
-            SinaisRuins[pon] = []
-            relatorioPons[pon] = {}
-            GetOntProvisionedAndOntOnline(tn, pon)
-            GetOntSignal(return_interfaceList, pon)
+        pon_olt = pon.replace("_", "-olt_")
+        tn.write(f'show pon power olt-rx {pon_olt}\n'.encode('utf-8'))
+        time.sleep(1)
+        return_interfaceList = tn.read_until(
+            'Control flag'.encode('utf-8'), 3).decode('utf-8').splitlines()
+        print(pon)
+        SinaisRuins[pon] = []
+        relatorioPons[pon] = {}
+        GetOntProvisionedAndOntOnline(tn, pon)
+        GetOntSignal(return_interfaceList, pon)
 
     GetDescriptionOfOnu(tn)
 
