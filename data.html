@@ -40,6 +40,74 @@
 
             <q-page-container>
                 <div class="container" style="margin: 20px;">
+
+
+                    <div class="ponInfoContainer">
+                        <div class="ponTitle">
+                            PON 1/0/1
+                        </div>
+                        <div class="ponGeralInfo">
+                            <div class="ponInfo">
+
+                                <div class="quantidadeOnu">
+                                    <div class="infoPon">Total de ONUs</div>
+                                    <q-item-label> Provisionada: 10</q-item-label>
+                                    <q-item-label>
+                                        <q-icon name="check" color="green"></q-icon>Online: 7
+                                    </q-item-label>
+                                    <q-item-label>
+                                        <q-icon name="cancel" color="red"></q-icon>Offline: 3
+                                    </q-item-label>
+                                </div>
+                                <div class="sinalOnu">
+                                    <div class="infoPon">Média de Sinal</div>
+                                    <q-item-label>
+                                        <q-icon name="check" color="green"></q-icon>Melhor: -11
+                                    </q-item-label>
+                                    <q-item-label>
+                                        <q-icon name="do_not_disturb_on" color="yellow"></q-icon> Média: -20
+                                    </q-item-label>
+                                    <q-item-label>
+                                        <q-icon name="cancel" color="red"></q-icon>Pior: -29
+                                    </q-item-label>
+                                </div>
+                                
+                            </div>
+
+                            <div class="ponGraph">
+                                <q-img src="gpon_1-13-1.png" style="width: 250px;"></q-img>
+                            </div>
+                        </div>
+                        <div class="ponUsers">
+                            <div class="ponUsersTitle">
+                                Clientes com sinais Ruins
+                            </div>
+                            <div class="ponUsersTable">
+                                <table border="1">
+                                    <tr>
+                                        <td>Nome</td>
+                                        <td>Idade</td>
+                                        <td>Profissão</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ted</td>
+                                        <td>22</td>
+                                        <td>Estudante</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ralf</td>
+                                        <td>26</td>
+                                        <td>Designer</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+
                     <h6>Equipamentos conectados - Qualidade de Sinal</h6>
                     <div class="tableQualidadeSinal">
                         <!-- <div class="q-pa-md">
@@ -68,26 +136,43 @@
                             </q-list>
                         </div> -->
                         <div v-for="pon in listaPons" :key="pon" class="q-pa-md">
-                            <q-list dense bordered >
+                            <q-list dense bordered>
                                 <h6 style="margin: 0;">PON: {{pon}}</h6>
                                 <q-item style="margin: 0;">
-                                    <q-item-section >
+                                    <q-item-section>
                                         <div class="infoPon">Total de ONUs</div>
-                                        <q-item-label>  Provisionada: {{relatorioPons[pon]["provisionada"]}}</q-item-label>
-                                        <q-item-label><q-icon name="check" color="green"></q-icon>Online: {{relatorioPons[pon]["online"]}}</q-item-label>
-                                        <q-item-label><q-icon name="cancel" color="red"></q-icon>Offline: {{relatorioPons[pon]["offline"]}}</q-item-label>
+                                        <q-item-label> Provisionada: {{relatorioPons[pon]["provisionada"]}}
+                                        </q-item-label>
+                                        <q-item-label>
+                                            <q-icon name="check" color="green"></q-icon>Online:
+                                            {{relatorioPons[pon]["online"]}}
+                                        </q-item-label>
+                                        <q-item-label>
+                                            <q-icon name="cancel" color="red"></q-icon>Offline:
+                                            {{relatorioPons[pon]["offline"]}}
+                                        </q-item-label>
                                     </q-item-section>
                                     <q-item-section>
                                         <div class="infoPon">Média de Sinal</div>
-                                        <q-item-label><q-icon name="check" color="green"></q-icon>Melhor: {{relatorioPons[pon]["melhorSinal"]}}</q-item-label>
-                                        <q-item-label> <q-icon name="do_not_disturb_on" color="yellow"></q-icon> Média: {{relatorioPons[pon]["mediaSinal"]}}</q-item-label>
-                                        <q-item-label><q-icon name="cancel" color="red"></q-icon>Pior: {{relatorioPons[pon]["piorSinal"]}}</q-item-label>
-                                        
+                                        <q-item-label>
+                                            <q-icon name="check" color="green"></q-icon>Melhor:
+                                            {{relatorioPons[pon]["melhorSinal"]}}
+                                        </q-item-label>
+                                        <q-item-label>
+                                            <q-icon name="do_not_disturb_on" color="yellow"></q-icon> Média:
+                                            {{relatorioPons[pon]["mediaSinal"]}}
+                                        </q-item-label>
+                                        <q-item-label>
+                                            <q-icon name="cancel" color="red"></q-icon>Pior:
+                                            {{relatorioPons[pon]["piorSinal"]}}
+                                        </q-item-label>
+
                                     </q-item-section>
 
                                     <q-item-section top side>
                                         <q-item-label caption>///</q-item-label>
-                                        <q-img :src="`${pon.replace('/','-').replace('/','-')}`+'.png'" style="width: 300px;"></q-img>
+                                        <q-img :src="`${pon.replace('/','-').replace('/','-')}`+'.png'"
+                                            style="width: 300px;"></q-img>
                                     </q-item-section>
                                 </q-item>
                             </q-list>
@@ -141,18 +226,7 @@
 
             },
             methods: {
-                async GetJson() {
-                    fetch('./dados.json', {
-                        method: 'GET',
-                        mode: 'cors',
-                        cache: 'default'
-                    })
-                        .then(res => res.json())
-                        .then(data => {
-                            this.jsonData = data
-                        })
 
-                }
             },
             created() {
 
@@ -167,7 +241,7 @@
 
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@1,500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@500&family=Poppins:ital,wght@1,500&display=swap');
 
         body,
         html {
@@ -187,8 +261,68 @@
             font-size: 10px;
         }
 
-        .infoPon{
+        .infoPon {
             font-size: 1.3em;
+            padding-bottom: 15px;
+        }
+
+
+
+
+
+        .ponInfoContainer {
+            border: 3px solid red;
+            
+
+        }
+
+        .ponTitle {
+            border: 3px solid rgb(206, 252, 0);
+            text-align: center;
+            font-family: 'Kanit', sans-serif;
+            font-size: 2em
+        }
+
+        .ponGeralInfo {
+            border: 3px solid rgb(247, 6, 194);
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        .ponInfo {
+            border: 3px solid rgb(17, 205, 252);
+            display: flex;
+            width: 400px;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+
+        .quantidadeOnu {
+            border: 3px solid rgb(245, 5, 5);
+        }
+
+        .sinalOnu {
+            border: 3px solid rgb(245, 5, 5);
+        }
+
+        .ponGraph {
+            border: 3px solid rgb(0, 250, 12);
+        }
+
+
+
+
+        .ponUsers{
+            border: 3px solid rgb(206, 252, 0);
+        }
+        .ponUsersTitle{
+            border: 3px solid rgb(6, 196, 47);
+            text-align: center;
+        }
+        .ponUsersTable{
+            border: 3px solid rgb(233, 11, 177);
+            text-align: center;
         }
     </style>
 </body>

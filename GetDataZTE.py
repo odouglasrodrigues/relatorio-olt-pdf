@@ -106,8 +106,10 @@ def GetDescriptionOfOnu(tn):
                 for linha in return_onuInformation:
                     if "Name:" in linha:
                         description = linha.split(':')[1].replace(' ', '')
+                    if "Serial number:" in linha:
+                        serial = linha.split(':')[1].replace(' ', '')
                         relatorioPons[pon]['onuComSinalRuim'].append(
-                            {"idOnu": onu["idOnu"], "sinal": onu["sinal"], "description": description})
+                            {"idOnu": onu["idOnu"], "sinal": onu["sinal"], "description": description, "serial": serial})
 
 
 def GetOntProvisionedAndOntOnline(tn, pon):
