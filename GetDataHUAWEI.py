@@ -120,7 +120,7 @@ def GetDescriptionOfOnu(tn):
                         description = linha.split(':')[1].replace(' ', '')
                         relatorioPons[pon]['onuComSinalRuim'].append(
                             {"idOnu": onu["idOnu"], "sinal": onu["sinal"], "description": description, "serial": serial})
-    print(relatorioPons)
+    
 
 
 def GetOntProvisionedAndOntOnline(tn, pon):
