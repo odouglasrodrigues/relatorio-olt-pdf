@@ -1,0 +1,27 @@
+const FormData = require('form-data');
+const fs = require('fs');
+const axios = require('axios')
+
+
+const number = 'PPDDNNNNNNNN@c.us'
+const token = 'TTTTTTTTTTTTTTTTTTTTTTT'
+const file = './RelatorioOLT.pdf'
+
+const form = new FormData();
+form.append('file', fs.createReadStream(file));
+form.append('token', token)
+form.append('number', number);
+
+axios({
+    method: 'post',
+    url: 'https://XXX.XXX.HHH.BR/api/v1/whatsapp/sendFile',
+    data: form,
+    headers: {
+        'Content-Type': 'multipart/form-data',
+        'token':token,
+        'number':number
+    }
+}).then(x=>{
+    console.log(x.data)
+})
+
